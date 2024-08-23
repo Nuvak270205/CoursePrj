@@ -13,104 +13,116 @@ package edu.iuh.fit;
  * @date: 8/21/2024
  * version: 1.0
  */
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 public class CourseList {
 
+    private Course[] courses;
     private int count = 0;
-    private List<Course> courses;
 
-    // Thêm một khóa học
-    public boolean addCourse(Course course) {
-        if (!exists(course)) {
-            courses.add(course);
-            count++;
-            return true;
-        } else {
-            System.out.println("Mã khóa học đã tồn tại.");
+    CourseList(int n) throws IllegalAccessException {
+        if (n <= 0)
+            throw new IllegalAccessException("");
+        courses = new Course[n];
+    }
+    public  Course[] getCourses(){
+        return courses;
+    }
+
+    public boolean addCourse(Course course){
+        if (course == null)
             return false;
+
+        if (isExists(course))
+            return  false;
+        //Check if array is full
+        if (count == courses.length)
+            return false;
+
+        courses[count++] = course;
+        return true;
+    }
+
+
+    private boolean isExists(Course course){
+        for (int i = 0; i < count; i++){
+            if (courses[i].getId().equalsIgnoreCase(course.getId()))
+                return true;
         }
+        return false;
     }
 
-    // Kiểm tra xem khóa học đã tồn tại chưa
-    private boolean exists(Course course) {
-        return courses.stream().anyMatch(c -> c.getId().equals(course.getId()));
-    }
-
-    // Tìm khoa có nhiều khóa học nhất
+    // Method to find the department with the most courses
     public String findDepartmentWithMostCourses() {
-        return courses.stream().map(Course::getDepartment)
-                .reduce((a, b) -> courses.stream().filter(c -> c.getDepartment().equals(a)).count() >
-                        courses.stream().filter(c -> c.getDepartment().equals(b)).count() ? a : b).orElse(null);
+        if (count == 0) return null;
+
+        Map<String, Integer> departmentCount = new HashMap<>();
+        for (int i = 0; i < count; i++) {
+            String department = courses[i].getDepartment();
+            departmentCount.put(department, departmentCount.getOrDefault(department, 0) + 1);
+        }
+
+        return departmentCount.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 
-    // Tìm các khóa học có số tín chỉ lớn nhất
+    // Method to find courses with the maximum credits
     public List<Course> findMaxCreditCourses() {
-        int maxCredits = courses.stream().mapToInt(Course::getCredit).max().orElse(0);
+        if (count == 0) return new ArrayList<>();
+
+        int maxCredit = Arrays.stream(courses, 0, count)
+                .mapToInt(Course::getCredit)
+                .max()
+                .orElse(0);
+
         List<Course> maxCreditCourses = new ArrayList<>();
-        for (Course course : courses) {
-            if (course.getCredit() == maxCredits) {
-                maxCreditCourses.add(course);
+        for (int i = 0; i < count; i++) {
+            if (courses[i].getCredit() == maxCredit) {
+                maxCreditCourses.add(courses[i]);
             }
         }
         return maxCreditCourses;
     }
-    // Xóa một khóa học
+
+    // Method to remove a course
     public boolean removeCourse(String id) {
-        Course course = searchCourseById(id);
-        if (course != null) {
-            courses.remove(course);
-            count--;
-            return true;
-        } else {
-            System.out.println("Không tìm thấy khóa học với mã: " + id);
-            return false;
+        for (int i = 0; i < count; i++) {
+            if (courses[i].getId().equalsIgnoreCase(id)) {
+                // Shift the elements to remove the course
+                System.arraycopy(courses, i + 1, courses, i, count - i - 1);
+                courses[--count] = null;
+                return true;
+            }
         }
+        System.out.println("Course ID not found: " + id);
+        return false;
     }
 
-    // Tìm kiếm khóa học theo tên (tìm tương đối)
+    // Method to search for courses by title (partial match)
     public List<Course> searchCourse(String title) {
         List<Course> foundCourses = new ArrayList<>();
-        for (Course course : courses) {
-            if (course.getTitle().toLowerCase().contains(title.toLowerCase())) {
-                foundCourses.add(course);
+        for (int i = 0; i < count; i++) {
+            if (courses[i].getTitle().toLowerCase().contains(title.toLowerCase())) {
+                foundCourses.add(courses[i]);
             }
         }
         return foundCourses.isEmpty() ? null : foundCourses;
     }
 
-    // Tìm kiếm khóa học theo khoa
+    // Method to search for courses by department
     public List<Course> searchCourseByDepartment(String department) {
         List<Course> foundCourses = new ArrayList<>();
-        for (Course course : courses) {
-            if (course.getDepartment().equalsIgnoreCase(department)) {
-                foundCourses.add(course);
+        for (int i = 0; i < count; i++) {
+            if (courses[i].getDepartment().equalsIgnoreCase(department)) {
+                foundCourses.add(courses[i]);
             }
         }
         return foundCourses.isEmpty() ? null : foundCourses;
     }
-    // Tìm kiếm khóa học theo mã
-    public Course searchCourseById(String id) {
-        return courses.stream().filter(c -> c.getId().equals(id)).findFirst().orElse(null);
-    }
 
-    // Sắp xếp khóa học theo tên
-    public List<Course> sortCourses() {
-        List<Course> sortedCourses = new ArrayList<>(courses);
-        sortedCourses.sort((c1, c2) -> c1.getTitle().compareToIgnoreCase(c2.getTitle()));
-        return sortedCourses;
-    }
-    //constructor
-    // Constructor
-    public CourseList(int n) {
-        if (n > 0) {
-            courses = new ArrayList<>(n);
-        } else {
-            throw new IllegalArgumentException("Số lượng khóa học phải lớn hơn 0");
-        }
-    }
-    //property get
-    public List<Course> getCourses() {
-        return new ArrayList<>(courses);
-    }
+
 }
