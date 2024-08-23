@@ -16,98 +16,91 @@ package edu.iuh.fit;
 import java.util.List;
 import java.util.Scanner;
 
+import java.util.List;
+
 public class TestCourse {
-    public static void initData(CourseList courseList) {
-        courseList.addCourse(new Course("CS101", "Nhập môn lập trình", 4, "CNTT"));
-        courseList.addCourse(new Course("CS102", "Cấu trúc dữ liệu", 3, "CNTT"));
-        courseList.addCourse(new Course("MT101", "Giải tích", 4, "Toán"));
-        courseList.addCourse(new Course("PH101", "Vật lý đại cương", 3, "Vật lý"));
-    }
+    public static void main(String[] args) throws IllegalAccessException {
 
-    public static void main(String[] args) {
-
-        Scanner scanner = new Scanner(System.in);
+        // Khởi tạo danh sách khóa học với dung lượng tối đa
         CourseList courseList = new CourseList(10);
 
-        initData(courseList);
+        // Tạo và thêm các khóa học vào danh sách
+        Course c1 = new Course("CS", "CS101", "Java Programming", 3);
+        Course c2 = new Course("SE", "SE201", "Database Programming", 3);
+        Course c3 = new Course("MA101", "Programming", "MA", 4);
+        Course c4 = new Course("CS102", "Java", "CS", 3);
 
-        while (true) {
-            System.out.println("\nMENU");
-            System.out.println("1. Thêm khóa học");
-            System.out.println("2. Xóa khóa học");
-            System.out.println("3. Tìm kiếm khóa học theo mã");
-            System.out.println("4. Tìm kiếm khóa học theo tên");
-            System.out.println("5. Tìm kiếm khóa học theo khoa");
-            System.out.println("6. Sắp xếp khóa học theo tên");
-            System.out.println("7. Tìm khóa học có tín chỉ lớn nhất");
-            System.out.println("8. Tìm khoa có nhiều khóa học nhất");
-            System.out.println("9. Thoát");
-            System.out.print("Lựa chọn của bạn: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
+        courseList.addCourse(c1);
+        courseList.addCourse(c2);
+        courseList.addCourse(c3);
+        courseList.addCourse(c4);
 
-            switch (choice) {
-                case 1:
-                    System.out.print("Nhập mã khóa học: ");
-                    String id = scanner.nextLine();
-                    System.out.print("Nhập tên khóa học: ");
-                    String title = scanner.nextLine();
-                    System.out.print("Nhập số tín chỉ: ");
-                    int credit = scanner.nextInt();
-                    scanner.nextLine();  // Consume newline
-                    System.out.print("Nhập khoa phụ trách: ");
-                    String department = scanner.nextLine();
-                    Course course = new Course(id, title, credit, department);
-                    courseList.addCourse(course);
-                    break;
-                case 2:
-                    System.out.print("Nhập mã khóa học cần xóa: ");
-                    String removeId = scanner.nextLine();
-                    courseList.removeCourse(removeId);
-                    break;
-                case 3:
-                    System.out.print("Nhập mã khóa học cần tìm: ");
-                    String searchId = scanner.nextLine();
-                    Course foundCourse = courseList.searchCourseById(searchId);
-                    System.out.println(foundCourse != null ? foundCourse : "Không tìm thấy khóa học.");
-                    break;
-                case 4:
-                    System.out.print("Nhập tên khóa học cần tìm: ");
-                    String searchTitle = scanner.nextLine();
-                    List<Course> foundCoursesByTitle = courseList.searchCourse(searchTitle);
-                    if (foundCoursesByTitle != null) {
-                        foundCoursesByTitle.forEach(System.out::println);
-                    } else {
-                        System.out.println("Không tìm thấy khóa học.");
-                    }
-                    break;
-                case 5:
-                    System.out.print("Nhập tên khoa cần tìm: ");
-                    String searchDepartment = scanner.nextLine();
-                    List<Course> foundCoursesByDepartment = courseList.searchCourseByDepartment(searchDepartment);
-                    if (foundCoursesByDepartment != null) {
-                        foundCoursesByDepartment.forEach(System.out::println);
-                    } else {
-                        System.out.println("Không tìm thấy khóa học.");
-                    }
-                    break;
-                case 6:
-                    List<Course> sortedCourses = courseList.sortCourses();
-                    sortedCourses.forEach(System.out::println);
-                    break;
-                case 7:
-                    List<Course> maxCreditCourses = courseList.findMaxCreditCourses();
-                    maxCreditCourses.forEach(System.out::println);
-                    break;
-                case 8:
-                    String departmentWithMostCourses = courseList.findDepartmentWithMostCourses();
-                    System.out.println("Khoa có nhiều khóa học nhất: " + departmentWithMostCourses);
-                    break;
-                case 9:
-                    System.out.println("Thoát chương trình...");
-                    return;
-                default:
-                    System.out.println("Lựa chọn không hợp lệ!");
+        // Hiển thị tất cả các khóa học
+        System.out.println("Tất cả các khóa học:");
+        for (Course c : courseList.getCourses()) {
+            if (c != null) {
+                System.out.println(c);
+            }
+        }
+
+        // Kiểm tra tìm kiếm theo khoa
+        String department = "CS";
+        System.out.println("\nCác khóa học thuộc khoa " + department + ":");
+        List<Course> csCourses = courseList.searchCourseByDepartment(department);
+        if (csCourses != null) {
+            for (Course c : csCourses) {
+                System.out.println(c);
+            }
+        } else {
+            System.out.println("Không tìm thấy khóa học nào.");
+        }
+
+        // Kiểm tra tìm kiếm theo tiêu đề
+        String title = "Lập trình";
+        System.out.println("\nCác khóa học có tiêu đề chứa '" + title + "':");
+        List<Course> foundCourses = courseList.searchCourse(title);
+        if (foundCourses != null) {
+            for (Course c : foundCourses) {
+                System.out.println(c);
+            }
+        } else {
+            System.out.println("Không tìm thấy khóa học nào.");
+        }
+
+        // Kiểm tra tìm khoa có nhiều khóa học nhất
+        System.out.println("\nKhoa có số lượng khóa học nhiều nhất:");
+        String departmentWithMostCourses = courseList.findDepartmentWithMostCourses();
+        if (departmentWithMostCourses != null) {
+            System.out.println(departmentWithMostCourses);
+        } else {
+            System.out.println("Danh sách khóa học trống.");
+        }
+
+        // Kiểm tra tìm các khóa học có số tín chỉ cao nhất
+        System.out.println("\nCác khóa học có số tín chỉ cao nhất:");
+        List<Course> maxCreditCourses = courseList.findMaxCreditCourses();
+        if (maxCreditCourses != null) {
+            for (Course c : maxCreditCourses) {
+                System.out.println(c);
+            }
+        } else {
+            System.out.println("Danh sách khóa học trống.");
+        }
+
+        // Kiểm tra xóa khóa học
+        System.out.println("\nXóa khóa học CS101...");
+        boolean removed = courseList.removeCourse("CS101");
+        if (removed) {
+            System.out.println("Khóa học CS101 đã được xóa.");
+        } else {
+            System.out.println("Không thể xóa khóa học CS101.");
+        }
+
+        // Hiển thị tất cả các khóa học sau khi xóa
+        System.out.println("\nTất cả các khóa học sau khi xóa:");
+        for (Course c : courseList.getCourses()) {
+            if (c != null) {
+                System.out.println(c);
             }
         }
     }
